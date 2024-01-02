@@ -6,9 +6,9 @@ module SolidusTracking
       module DisableConfirmEmail
         def self.prepended(base)
           base.module_eval do
-            alias_method :original_order_finalized, :order_finalized
+            alias_method :original_order_finalized, :send_confirmation_email
 
-            def order_finalized(event)
+            def send_confirmation_email(event)
               return if SolidusTracking.configuration.disable_builtin_emails
 
               original_order_finalized(event)
@@ -21,5 +21,5 @@ module SolidusTracking
 end
 
 if Spree.solidus_gem_version >= Gem::Version.new('2.9.0')
-  Spree::MailerSubscriber.prepend(SolidusTracking::Spree::MailerSubscriber::DisableConfirmEmail)
+  Spree::OrderMailerSubscriber.prepend(SolidusTracking::Spree::MailerSubscriber::DisableConfirmEmail)
 end
